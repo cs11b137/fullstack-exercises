@@ -1,1 +1,1 @@
-# submission-repository
+# fullstact exercises
