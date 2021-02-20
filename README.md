@@ -1,1 +1,1 @@
-# fullstact exercises
+# fullstack exercises
