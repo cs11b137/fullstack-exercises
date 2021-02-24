@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Filter from './components/Filter';
+import FilteredCountries from './components/FilteredCountries';
 
 const App = () => {
 	const [searchStr, setSearchStr] = useState('');
@@ -17,23 +19,13 @@ const App = () => {
 			c.name.toLowerCase().includes(event.target.value.toLowerCase()) === true
 		);
 
-		if (filteredCountries.length > 10) {
-
-		}
-
-		if (filteredCountries.length === 1) {
-
-		}
-
 		setCountries(filteredCountries);
 	};
 
 	return (
 		<div>
-			<div>
-				find countries <input value={searchStr} onChange={handleSearchStrChange} />
-			</div>
-			<div></div>
+			<Filter searchStr={searchStr} handleSearchStrChange={handleSearchStrChange} />
+			<FilteredCountries filteredCountries={countries} />
 		</div>
 	);
 };
