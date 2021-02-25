@@ -72,9 +72,8 @@ const App = () => {
 					}, 3000);
 					setPersons(persons.filter(p => p.id !== person.id));
 				});
-
-				return;
 			}
+            return;
 		}
 
 		const personObject = {
