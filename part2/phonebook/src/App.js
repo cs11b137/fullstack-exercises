@@ -66,11 +66,10 @@ const App = () => {
 						setSuccessMsg(null);
 					}, 3000);
 				}).catch(error => {
-					setErrorMsg(`the ${person.name} was already deleted from server`);
+					setErrorMsg(error.response.data.error);
 					setTimeout(() => {
 						setErrorMsg(null);
-					}, 3000);
-					setPersons(persons.filter(p => p.id !== person.id));
+					}, 5000);
 				});
 			}
             return;
@@ -89,6 +88,11 @@ const App = () => {
 			setTimeout(() => {
 				setSuccessMsg(null);
 			}, 3000);
+		}).catch(err => {
+			setErrorMsg(`${err.response.data.error}`);
+			setTimeout(() => {
+				setErrorMsg(null);
+			}, 5000);
 		});
 	};
 
