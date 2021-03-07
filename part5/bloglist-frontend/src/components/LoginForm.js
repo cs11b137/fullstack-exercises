@@ -1,24 +1,39 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const LoginForm = props => {
+const LoginForm = ({ login }) => {
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+        const credentials = {
+            username,
+            password
+        }
+
+        await login(credentials)
+        setUsername('')
+        setPassword('')
+    }
+
     return (
         <div>
             <h1>log in to application</h1>
-            <form onSubmit={props.handleLoginSubmit}>
+            <form onSubmit={handleSubmit}>
                 <div>
                     username:
                 <input
                         type="text"
-                        value={props.username}
-                        onChange={props.handleUsernameChange}
+                        value={username}
+                        onChange={({ target }) => setUsername(target.value)}
                     />
                 </div>
                 <div>
                     password:
                 <input
                         type="password"
-                        value={props.password}
-                        onChange={props.handlePasswordChange}
+                        value={password}
+                        onChange={({ target }) => setPassword(target.value)}
                     />
                 </div>
                 <button type="submit">login</button>

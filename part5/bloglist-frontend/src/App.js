@@ -2,26 +2,24 @@ import React, { useState, useEffect } from 'react'
 import BlogList from './components/BlogList'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
+import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const [blogs, setBlogs] = useState([])
-
-    const [title, setTitle] = useState('')
-    const [author, setAuthor] = useState('')
-    const [url, setUrl] = useState('')
 
     const [successMsg, setSuccessMsg] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
 
     useEffect(() => {
-        blogService.getAll().then(blogs =>
-            setBlogs(blogs)
-        )
+        const initBlogs = async () => {
+            const result = await blogService.getAll()
+            setBlogs(result)
+        }
+        initBlogs()
     }, [])
 
     useEffect(() => {
@@ -33,40 +31,23 @@ const App = () => {
         }
     }, [])
 
-    const handleUsernameChange = (event) => {
-        setUsername(event.target.value)
-    }
-
-    const handlePasswordChange = (event) => {
-        setPassword(event.target.value)
-    }
-
-    const handleLoginSubmit = (event) => {
-        event.preventDefault()
-
-        const credentials = {
-            username,
-            password
-        }
-
-        loginService.login(credentials).then(returnedUser => {
+    const login = async (credentials) => {
+        try {
+            const returnedUser = await loginService.login(credentials)
             window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(returnedUser))
-
             setUser(returnedUser)
             blogService.setToken(returnedUser.token)
-            setUsername('')
-            setPassword('')
 
             setSuccessMsg('login success')
             setTimeout(() => {
                 setSuccessMsg(null)
             }, 5000)
-        }).catch(exception => {
-            setErrorMsg(exception.response.data.error)
+        } catch (error) {
+            setErrorMsg(error.response.data.error)
             setTimeout(() => {
                 setErrorMsg(null)
             }, 5000)
-        })
+        }
     }
 
     const handleLogoutClick = () => {
@@ -74,30 +55,13 @@ const App = () => {
         setUser(null)
     }
 
-    const handleTitleChange = (event) => {
-        setTitle(event.target.value)
+    const createBlog = async (newBlog) => {
+        const returnedBlog = await blogService.create(newBlog)
+        setBlogs(blogs.concat(returnedBlog))
     }
 
-    const handleAuthorChange = event => {
-        setAuthor(event.target.value)
-    }
-
-    const handleUrlChange = event => {
-        setUrl(event.target.value)
-    }
-
-    const handleCreate = () => {
-        const newBlog = {
-            title,
-            author,
-            url
-        }
-        blogService.create(newBlog).then(returnedBlog => {
-            setBlogs(blogs.concat(returnedBlog))
-            setTitle('')
-            setAuthor('')
-            setUrl('')
-        })
+    const addLike = async () => {
+        
     }
 
     return (
@@ -105,25 +69,17 @@ const App = () => {
             <Notification message={successMsg} status="success" />
             <Notification message={errorMsg} status="error" />
             {user ?
-                <BlogList
-                    title={title}
-                    author={author}
-                    url={url}
-                    handleTitleChange={handleTitleChange}
-                    handleAuthorChange={handleAuthorChange}
-                    handleUrlChange={handleUrlChange}
-                    handleCreate={handleCreate}
-                    blogs={blogs}
-                    user={user}
-                    handleLogoutClick={handleLogoutClick}
-                /> :
-                <LoginForm
-                    username={username}
-                    password={password}
-                    handleLoginSubmit={handleLoginSubmit}
-                    handleUsernameChange={handleUsernameChange}
-                    handlePasswordChange={handlePasswordChange}
-                />}
+                <div>
+                    <Togglable>
+                        <BlogForm createBlog={createBlog} />
+                    </Togglable>
+                    <BlogList 
+                        blogs={blogs} 
+                        user={user} 
+                        handleLogoutClick={handleLogoutClick} 
+                    />
+                </div> :
+                <LoginForm login={login} />}
         </div>
     )
 }
