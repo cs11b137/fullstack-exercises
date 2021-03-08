@@ -5,9 +5,6 @@ const Togglable = (props) => {
 
     const hide = { display: isVisible ? 'none' : '' }
     const show = { display: isVisible ? '' : 'none' }
-
-
-    
     return (
         <div>
             <div style={hide}>
@@ -21,4 +18,4 @@ const Togglable = (props) => {
     )
 }
 
-export default Togglable;
+export default Togglable

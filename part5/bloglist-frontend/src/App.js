@@ -11,13 +11,13 @@ const App = () => {
     const [user, setUser] = useState(null)
     const [blogs, setBlogs] = useState([])
 
-    const [successMsg, setSuccessMsg] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
+    const [successMsg, setSuccessMsg] = useState(null)
+    const [errorMsg, setErrorMsg] = useState(null)
 
     useEffect(() => {
         const initBlogs = async () => {
-            const result = await blogService.getAll()
-            setBlogs(result)
+            const blogs = await blogService.getAll()
+            setBlogs(blogs.sort((a, b) => b.likes - a.likes))
         }
         initBlogs()
     }, [])
@@ -50,7 +50,7 @@ const App = () => {
         }
     }
 
-    const handleLogoutClick = () => {
+    const logout = () => {
         window.localStorage.removeItem('loggedBlogAppUser')
         setUser(null)
     }
@@ -60,8 +60,32 @@ const App = () => {
         setBlogs(blogs.concat(returnedBlog))
     }
 
-    const addLike = async () => {
-        
+    const addLike = async (blog) => {
+        const newObject = {
+            ...blog,
+            likes: blog.likes + 1,
+            user: blog.user.id
+        }
+        delete newObject.id
+
+        try {
+            const updatedBlog = await blogService.update(blog.id, newObject)
+            const newBlogs = blogs.map(b => b.id === updatedBlog.id ? updatedBlog : b)
+            setBlogs(newBlogs.sort((a, b) => b.likes - a.likes))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const remove = async (blog) => {
+        if (window.confirm(`Remove ${blog.title}! by ${blog.author}`)) {
+            try {
+                await blogService.remove(blog.id)
+                setBlogs(blogs.filter(b => b.id !== blog.id))
+            } catch (error) {
+                console.log(error)
+            }
+        }
     }
 
     return (
@@ -73,10 +97,12 @@ const App = () => {
                     <Togglable>
                         <BlogForm createBlog={createBlog} />
                     </Togglable>
-                    <BlogList 
-                        blogs={blogs} 
-                        user={user} 
-                        handleLogoutClick={handleLogoutClick} 
+                    <BlogList
+                        blogs={blogs}
+                        user={user}
+                        logout={logout}
+                        addLike={addLike}
+                        remove={remove}
                     />
                 </div> :
                 <LoginForm login={login} />}

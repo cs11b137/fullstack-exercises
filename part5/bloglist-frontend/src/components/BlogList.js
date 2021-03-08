@@ -1,19 +1,19 @@
 import React from 'react'
 import Blog from './Blog'
 
-const BlogList = (props) => {
+const BlogList = ({ blogs, user, logout, addLike, remove }) => {
 
     return (
         <div>
             <h2>blogs</h2>
-            <p>{props.user.username} logged in
-                <button onClick={props.handleLogoutClick}>logout</button>
+            <p>{user.username} logged in
+                <button onClick={logout}>logout</button>
             </p>
-            {props.blogs.map(blog =>
-                <Blog key={blog.id} blog={blog} />
+            {blogs.map(blog =>
+                <Blog key={blog.id} blog={blog} user={user} addLike={addLike} remove={remove} />
             )}
         </div>
-    );
-};
+    )
+}
 
 export default BlogList
