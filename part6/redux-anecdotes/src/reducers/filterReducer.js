@@ -1,10 +1,15 @@
-const reducer = (state, action) => {
-    
+const reducer = (state='', action) => {
+    if (action.type === 'FILTER_CHANGE') {
+        return action.data.key
+    }
+
+    return state
 }
 
-export const filter = () => {
+export const filterChange = (key) => {
     return {
-        type: 'FILTER'
+        type: 'FILTER_CHANGE',
+        data: { key }
     }
 }
 

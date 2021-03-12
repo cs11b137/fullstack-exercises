@@ -6,7 +6,13 @@ import Notification from './components/Notification'
 import Filter from './components/Filter'
 
 const App = () => {
-    const anecdotes = useSelector(state => state.anecdotes)
+    const anecdotes = useSelector(({ anecdotes, filter }) => {
+        if (!filter) {
+            return anecdotes
+        }
+
+        return anecdotes.filter(a => a.content.toLowerCase().includes(filter))
+    })
     const notification = useSelector(state => state.notification)
 
     return (
