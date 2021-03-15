@@ -1,26 +1,24 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import AnecdoteForm from './components/AnecdoteForm'
 import AnecdoteList from './components/AnecdoteList'
 import Notification from './components/Notification'
 import Filter from './components/Filter'
+import { initialAnecdotes } from './reducers/anecdoteReducer'
 
 const App = () => {
-    const anecdotes = useSelector(({ anecdotes, filter }) => {
-        if (!filter) {
-            return anecdotes
-        }
-
-        return anecdotes.filter(a => a.content.toLowerCase().includes(filter))
-    })
-    const notification = useSelector(state => state.notification)
+    const dispatch = useDispatch()
+    
+    useEffect(() => {
+        dispatch(initialAnecdotes()) 
+    }, [dispatch])
 
     return (
         <div>
-            <Notification notification={notification} />  
+            <Notification />
             <h2>Anecdotes</h2>
             <Filter />
-            <AnecdoteList anecdotes={anecdotes} />
+            <AnecdoteList />
             <AnecdoteForm />
         </div>
     )
