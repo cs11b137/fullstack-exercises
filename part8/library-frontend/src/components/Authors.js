@@ -1,9 +1,26 @@
-import React from 'react'
-import { useQuery } from '@apollo/client'
+import React, { useState } from 'react'
+import { useQuery, useMutation, gql } from '@apollo/client'
 import { ALL_AUTHORS } from '../queries'
+
+const UPDATE_AUTHOR = gql`
+mutation updateAuthor($name: String, $born: Int!) {
+    editAuthor(
+        name: $name
+        born: $born
+    ) {
+        name
+        born
+    }
+}
+`
 
 const Authors = (props) => {
     const { loading, error, data } = useQuery(ALL_AUTHORS)
+    const [selectedName, setSelectedName] = useState('please select')
+    const [born, setBorn] = useState('')
+    const [ updateAuthor ] = useMutation(UPDATE_AUTHOR, {
+        refetchQueries: [ { query: ALL_AUTHORS } ]
+    })
 
     if (!props.show) {
         return null
@@ -15,6 +32,22 @@ const Authors = (props) => {
 
     if (error) {
         return <div>error: `${error}`</div>
+    }
+
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+        console.log(selectedName)
+        console.log(born)
+
+        const response = await updateAuthor({ variables: { name: selectedName, born: parseInt(born) } })
+        console.log(response)
+
+        setSelectedName('')
+        setBorn('')
+    }
+
+    const handleChange = (event) => {
+        setSelectedName(event.currentTarget.value)
     }
 
     return (
@@ -40,7 +73,23 @@ const Authors = (props) => {
                     )}
                 </tbody>
             </table>
-
+            <h2>set author birthyear</h2>
+            <form onSubmit={handleSubmit}>
+                <p>
+                    <select value={selectedName} onChange={handleChange}>
+                        <option value="please select">please select</option>
+                        {data.allAuthors.map(a =>
+                            <option key={a.name} value={a.name}>{a.name}</option>
+                        )}
+                    </select>
+                </p>
+                <p>
+                    born <input value={born} onChange={({ target }) => setBorn(target.value)} />
+                </p>
+                <p>
+                    <button type="submit">update author</button>
+                </p>
+            </form>
         </div>
     )
 }
